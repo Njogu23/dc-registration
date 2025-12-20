@@ -1,0 +1,31 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Registration {
+  id                String   @id @default(cuid())
+  fullName          String
+  email             String
+  designation       String
+  memberType        String
+  club              String
+  otherClub         String?
+  paymentType       String
+  paymentCode       String
+  confirmationCode  String
+  paymentConfirmed  Boolean  @default(false)
+  emailSent         Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([confirmationCode])
+  @@index([email])
+  @@index([paymentConfirmed])
+}

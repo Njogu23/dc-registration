@@ -1,4 +1,4 @@
-// src/components/RegistrationPage.js
+// src/components/RegForm.js
 "use client"
 import React, { useState } from 'react';
 import { CheckCircle, Calendar, MapPin, Users } from 'lucide-react';
@@ -14,6 +14,7 @@ const RegistrationPage = () => {
     designation: '',
     memberType: "Y's Man",
     club: '',
+    otherClub: '',
     paymentType: "Early Bird Y's Man"
   }]);
   const [paymentCode, setPaymentCode] = useState('');
@@ -30,6 +31,7 @@ const RegistrationPage = () => {
       designation: '',
       memberType: "Y's Man",
       club: '',
+      otherClub: '',
       paymentType: "Early Bird Y's Man"
     }]);
   };
@@ -51,6 +53,11 @@ const RegistrationPage = () => {
             : "Early Bird Y's Youth";
         }
         
+        // Clear otherClub if club is not "Other"
+        if (field === 'club' && value !== 'Other') {
+          updated.otherClub = '';
+        }
+        
         return updated;
       }
       return p;
@@ -58,9 +65,12 @@ const RegistrationPage = () => {
   };
 
   const handleSubmit = async () => {
-    const isValid = participants.every(p => 
-      p.fullName && p.email && p.designation && p.club && paymentCode
-    );
+    // Validate all fields including otherClub when club is "Other"
+    const isValid = participants.every(p => {
+      const basicFieldsValid = p.fullName && p.email && p.designation && p.club;
+      const otherClubValid = p.club === 'Other' ? p.otherClub.trim() !== '' : true;
+      return basicFieldsValid && otherClubValid && paymentCode;
+    });
 
     if (!isValid) {
       setError('Please fill in all required fields for all participants');
@@ -99,6 +109,7 @@ const RegistrationPage = () => {
           designation: '',
           memberType: "Y's Man",
           club: '',
+          otherClub: '',
           paymentType: "Early Bird Y's Man"
         }]);
         setPaymentCode('');
@@ -210,7 +221,7 @@ const RegistrationPage = () => {
                       value={participant.designation}
                       onChange={(e) => updateParticipant(participant.id, 'designation', e.target.value)}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="e.g., President, Secretary, Member"
+                      placeholder="e.g., CP, DG, PDG, DYR, Y's Man, Y's Youth"
                     />
                   </div>
 
@@ -250,6 +261,21 @@ const RegistrationPage = () => {
                       </optgroup>
                     </select>
                   </div>
+
+                  {participant.club === 'Other' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Specify Other Club *
+                      </label>
+                      <input
+                        type="text"
+                        value={participant.otherClub}
+                        onChange={(e) => updateParticipant(participant.id, 'otherClub', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Enter your club name"
+                      />
+                    </div>
+                  )}
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">

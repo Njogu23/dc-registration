@@ -1,16 +1,15 @@
-// api/registration/route.js
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+// src/app/api/registrations/route.js
 
-const prisma = new PrismaClient();
+import { NextResponse } from 'next/server'
+import prisma from '@/lib/prisma'
 
-export async function GET(Request) {
+export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const search = searchParams.get('search') || '';
-    const filter = searchParams.get('filter') || 'all';
+    const { searchParams } = new URL(request.url)
+    const search = searchParams.get('search') || ''
+    const filter = searchParams.get('filter') || 'all'
 
-    const where = {};
+    const where = {}
     
     if (search) {
       where.OR = [
@@ -18,26 +17,26 @@ export async function GET(Request) {
         { email: { contains: search, mode: 'insensitive' } },
         { club: { contains: search, mode: 'insensitive' } },
         { confirmationCode: { contains: search, mode: 'insensitive' } },
-      ];
+      ]
     }
 
     if (filter === 'confirmed') {
-      where.paymentConfirmed = true;
+      where.paymentConfirmed = true
     } else if (filter === 'pending') {
-      where.paymentConfirmed = false;
+      where.paymentConfirmed = false
     }
 
     const registrations = await prisma.registration.findMany({
       where,
-      orderBy: { registeredAt: 'desc' },
-    });
+      orderBy: { createdAt: 'desc' },
+    })
 
-    return NextResponse.json(registrations);
+    return NextResponse.json(registrations)
   } catch (error) {
-    console.error('Fetch error:', error);
+    console.error('Fetch error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch registrations' },
       { status: 500 }
-    );
+    )
   }
 }

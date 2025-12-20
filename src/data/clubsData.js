@@ -1,26 +1,26 @@
 // src/data/clubsData.js
 
 export const ysMenClubs = [
-  'Nairobi',
-  'Nairobi City',
-  'Nairobi Metro',
-  'Nairobi South',
-  'Triple Y',
-  'Thika',
-  'Kisumu',
-  'Kitui',
-  'Mutomo',
-  'Kakamega',
-  'Githumu',
-  'Other'
+  "Githumu",
+  "Kakamega",
+  "Kisumu",
+  "Kitui",
+  "Mutomo",
+  "Nairobi",
+  "Nairobi City",
+  "Nairobi Metro",
+  "Nairobi South",
+  "Thika",
+  "Triple Y",
+  "Other"
 ];
 
 export const ysYouthClubs = [
-  'Nairobi',
-  'Nairobi Metro',
-  'Kitui',
-  'Meru',
-  'Kakamega',
-  'Kimumu',
-  'Other'
+  "Kakamega",
+  "Kisumu",
+  "Kitui",
+  "Meru",
+  "Nairobi",
+  "Nairobi Metro",
+  "Other"
 ];

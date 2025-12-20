@@ -1,58 +1,59 @@
-// src/components/AdminPage.js
+// src/app/district-conference-list/List.js
+
 "use client"
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, Mail, CheckCircle, XCircle, Users, ArrowLeft, RefreshCw } from 'lucide-react';
-import { paymentTypes } from '../data/paymentTypes';
+import React, { useState, useEffect } from 'react'
+import { Search, Filter, Mail, CheckCircle, XCircle, Users, RefreshCw, Copy, Check } from 'lucide-react'
+import { paymentTypes } from '@/data/paymentTypes'
 
 const AdminPage = () => {
-  const [registrations, setRegistrations] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [registrations, setRegistrations] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterStatus, setFilterStatus] = useState('all')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    fetchRegistrations();
-  }, []);
+    fetchRegistrations()
+  }, [])
 
   const fetchRegistrations = async () => {
     try {
-      setLoading(true);
-      setError('');
+      setLoading(true)
+      setError('')
       
-      const params = new URLSearchParams();
-      if (searchTerm) params.append('search', searchTerm);
-      if (filterStatus !== 'all') params.append('filter', filterStatus);
+      const params = new URLSearchParams()
+      if (searchTerm) params.append('search', searchTerm)
+      if (filterStatus !== 'all') params.append('filter', filterStatus)
 
-      const response = await fetch(`/api/registration?${params}`);
+      const response = await fetch(`/api/registrations?${params}`)
       
       if (!response.ok) {
-        throw new Error('Failed to fetch registrations');
+        throw new Error('Failed to fetch registrations')
       }
 
-      const data = await response.json();
-      setRegistrations(data);
+      const data = await response.json()
+      setRegistrations(data)
     } catch (err) {
-      setError(err.message);
-      console.error('Fetch error:', err);
+      setError(err.message)
+      console.error('Fetch error:', err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleSearch = () => {
-    fetchRegistrations();
-  };
+    fetchRegistrations()
+  }
 
   const handleFilterChange = (value) => {
-    setFilterStatus(value);
-    // Trigger fetch after state update
-    setTimeout(fetchRegistrations, 0);
-  };
+    setFilterStatus(value)
+    setTimeout(fetchRegistrations, 0)
+  }
 
   const togglePaymentStatus = async (id, currentStatus) => {
     try {
-      const response = await fetch(`/api/registration/${id}`, {
+      const response = await fetch(`/api/registrations/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -60,24 +61,25 @@ const AdminPage = () => {
         body: JSON.stringify({
           paymentConfirmed: !currentStatus
         }),
-      });
+      })
 
       if (response.ok) {
+        const updated = await response.json()
         setRegistrations(registrations.map(r => 
-          r.id === id ? { ...r, paymentConfirmed: !currentStatus } : r
-        ));
+          r.id === id ? updated : r
+        ))
       } else {
-        throw new Error('Failed to update payment status');
+        throw new Error('Failed to update payment status')
       }
     } catch (err) {
-      console.error('Update error:', err);
-      alert('Failed to update payment status');
+      console.error('Update error:', err)
+      alert('Failed to update payment status')
     }
-  };
+  }
 
   const toggleEmailStatus = async (id, currentStatus) => {
     try {
-      const response = await fetch(`/api/registration/${id}`, {
+      const response = await fetch(`/api/registrations/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -85,35 +87,129 @@ const AdminPage = () => {
         body: JSON.stringify({
           emailSent: !currentStatus
         }),
-      });
+      })
 
       if (response.ok) {
+        const updated = await response.json()
         setRegistrations(registrations.map(r => 
-          r.id === id ? { ...r, emailSent: !currentStatus } : r
-        ));
+          r.id === id ? updated : r
+        ))
       } else {
-        throw new Error('Failed to update email status');
+        throw new Error('Failed to update email status')
       }
     } catch (err) {
-      console.error('Update error:', err);
-      alert('Failed to update email status');
+      console.error('Update error:', err)
+      alert('Failed to update email status')
     }
-  };
+  }
+
+  const copyFormattedLists = () => {
+  // Better filtering logic that matches your actual memberType values
+  const ysMen = registrations.filter(r => {
+    const memberType = r.memberType.toLowerCase();
+    return (
+      memberType.includes('men') || 
+      memberType.includes('member') ||
+      memberType.includes('adult') ||
+      memberType === "y's men" ||
+      memberType === "y's men member" ||
+      memberType === "ys men" ||
+      !memberType.includes('youth') // If it's not youth, assume it's men
+    );
+  });
+  
+  const ysYouth = registrations.filter(r => {
+    const memberType = r.memberType.toLowerCase();
+    return (
+      memberType.includes('youth') ||
+      memberType === "y's youth" ||
+      memberType === "ys youth"
+    );
+  });
+
+  console.log('Debug - All registrations:', registrations);
+  console.log('Debug - Y\'s Men count:', ysMen.length);
+  console.log('Debug - Y\'s Youth count:', ysYouth.length);
+  console.log('Debug - Member types found:', [...new Set(registrations.map(r => r.memberType))]);
+
+  // Format the text
+  let formattedText = "*Y's Men List*\n";
+  
+  // Add Y's Men
+  if (ysMen.length > 0) {
+    ysMen.forEach(reg => {
+      const status = reg.paymentConfirmed ? '✅' : '❌';
+      // Handle club name - use otherClub if club is "Other"
+      const clubDisplay = reg.club === 'Other' && reg.otherClub 
+        ? reg.otherClub 
+        : reg.club;
+      formattedText += `${reg.designation} ${reg.fullName}  -  ${clubDisplay} ${status}\n`;
+    });
+  } else {
+    formattedText += "No Y's Men registrations\n";
+  }
+  
+  // Add separator
+  formattedText += "\n";
+  formattedText += "----------------------\n";
+  formattedText += "\n";
+  
+  // Add Y's Youth
+  formattedText += "*Y's Youth List*\n";
+  if (ysYouth.length > 0) {
+    ysYouth.forEach(reg => {
+      const status = reg.paymentConfirmed ? '✅' : '❌';
+      // Handle club name - use otherClub if club is "Other"
+      const clubDisplay = reg.club === 'Other' && reg.otherClub 
+        ? reg.otherClub 
+        : reg.club;
+      formattedText += `${reg.designation} ${reg.fullName}  -  ${clubDisplay} ${status}\n`;
+    });
+  } else {
+    formattedText += "No Y's Youth registrations\n";
+  }
+   formattedText += "\n";
+  formattedText += "----------------------\n";
+  formattedText += "\n";
+  // Add summary
+  formattedText += `\nTotal: ${registrations.length} registration${registrations.length !== 1 ? 's' : ''} (${ysMen.length} Y's Men, ${ysYouth.length} Y's Youth)`;
+  formattedText += `\nConfirmed: ${registrations.filter(r => r.paymentConfirmed).length}`;
+  formattedText += `\nPending: ${registrations.filter(r => !r.paymentConfirmed).length}`;
+
+  console.log('Debug - Formatted text:', formattedText);
+
+  // Copy to clipboard
+  navigator.clipboard.writeText(formattedText).then(() => {
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }).catch(err => {
+    console.error('Failed to copy:', err);
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = formattedText;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  });
+}
 
   const groupedRegistrations = registrations.reduce((acc, reg) => {
     if (!acc[reg.confirmationCode]) {
-      acc[reg.confirmationCode] = [];
+      acc[reg.confirmationCode] = []
     }
-    acc[reg.confirmationCode].push(reg);
-    return acc;
-  }, {});
+    acc[reg.confirmationCode].push(reg)
+    return acc
+  }, {})
 
   const totalRevenue = registrations
     .filter(r => r.paymentConfirmed)
     .reduce((total, r) => {
-      const payment = paymentTypes[r.memberType]?.find(pt => pt.label === r.paymentType);
-      return total + (payment ? payment.amount : 0);
-    }, 0);
+      const payment = paymentTypes[r.memberType]?.find(pt => pt.label === r.paymentType)
+      return total + (payment ? payment.amount : 0)
+    }, 0)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -129,7 +225,6 @@ const AdminPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="text-sm text-gray-600 mb-1">Total Registrations</div>
@@ -158,10 +253,19 @@ const AdminPage = () => {
         <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
           <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
             <h2 className="text-2xl font-bold text-gray-800">All Registrations</h2>
-            <div className="flex items-center gap-3">
-              <div className="text-sm text-gray-600">
-                Showing: <span className="font-bold text-blue-600">{registrations.length}</span> registrations
-              </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={copyFormattedLists}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+                  copied 
+                    ? 'bg-green-600 text-white hover:bg-green-700' 
+                    : 'bg-gray-800 text-white hover:bg-gray-900'
+                }`}
+                disabled={registrations.length === 0}
+              >
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+                {copied ? 'Copied!' : 'Copy Lists'}
+              </button>
               <button
                 onClick={fetchRegistrations}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
@@ -255,7 +359,7 @@ const AdminPage = () => {
                       </thead>
                       <tbody>
                         {regs.map((reg) => {
-                          const payment = paymentTypes[reg.memberType]?.find(pt => pt.label === reg.paymentType);
+                          const payment = paymentTypes[reg.memberType]?.find(pt => pt.label === reg.paymentType)
                           return (
                             <tr key={reg.id} className="border-t border-gray-200 hover:bg-gray-50">
                               <td className="px-4 py-3">
@@ -265,7 +369,11 @@ const AdminPage = () => {
                                 </div>
                               </td>
                               <td className="px-4 py-3 text-sm text-gray-700">{reg.email}</td>
-                              <td className="px-4 py-3 text-sm text-gray-700">{reg.club}</td>
+                              <td className="px-4 py-3 text-sm text-gray-700">
+                                {reg.club === 'Other' && reg.otherClub 
+                                  ? `${reg.club} (${reg.otherClub})` 
+                                  : reg.club}
+                              </td>
                               <td className="px-4 py-3 text-sm text-gray-700">{reg.memberType}</td>
                               <td className="px-4 py-3 text-sm font-semibold text-gray-900">
                                 KES {payment?.amount.toLocaleString() || 'N/A'}
@@ -306,7 +414,7 @@ const AdminPage = () => {
                                 </button>
                               </td>
                             </tr>
-                          );
+                          )
                         })}
                       </tbody>
                     </table>
@@ -326,7 +434,7 @@ const AdminPage = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AdminPage;
+export default AdminPage

@@ -1,6 +1,6 @@
 // src/utils/helpers.js
 
-import { paymentTypes } from '../data/paymentTypes';
+import { paymentTypes } from "@/data/paymentTypes";
 
 /**
  * Generate a unique confirmation code

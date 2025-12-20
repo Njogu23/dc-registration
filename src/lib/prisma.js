@@ -1,16 +1,25 @@
-// src/lib/prisma.js
-import { PrismaClient } from '@prisma/client'
+// lib/prisma.js
+const { PrismaClient } = require('@prisma/client')
 
-const prismaClientSingleton = () => {
-  return new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+let prisma
+
+if (process.env.NODE_ENV === 'production') {
+  prisma = new PrismaClient({
+    log: ['error'],
   })
+} else {
+  // In development, prevent multiple instances
+  if (!global.prisma) {
+    global.prisma = new PrismaClient({
+      log: ['query', 'error', 'warn'],
+    })
+  }
+  prisma = global.prisma
 }
 
-const globalForPrisma = globalThis
+// Test connection on startup
+prisma.$connect()
+  .then(() => console.log('✅ Database connected'))
+  .catch(err => console.error('❌ Database connection failed:', err))
 
-const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
-
-export default prisma
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+module.exports = prisma
