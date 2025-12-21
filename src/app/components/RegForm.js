@@ -1,7 +1,8 @@
 // src/components/RegForm.js
 "use client"
 import React, { useState } from 'react';
-import { CheckCircle, Calendar, MapPin, Users } from 'lucide-react';
+import { CheckCircle, Calendar, MapPin, Users, Copy, Check } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 import { ysMenClubs, ysYouthClubs } from '@/data/clubsData';
 import { paymentTypes } from '@/data/paymentTypes';
 import { calculateTotal } from '@/utils/helpers';
@@ -19,9 +20,18 @@ const RegistrationPage = () => {
   }]);
   const [paymentCode, setPaymentCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [confirmationCode, setConfirmationCode] = useState('');
-  const [error, setError] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  const copyPhoneNumber = () => {
+    const phoneNumber = '+254720424456';
+    navigator.clipboard.writeText(phoneNumber).then(() => {
+      setCopied(true);
+      toast.success('Phone number copied!');
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {
+      toast.error('Failed to copy');
+    });
+  };
 
   const addParticipant = () => {
     setParticipants([...participants, {
@@ -73,12 +83,11 @@ const RegistrationPage = () => {
     });
 
     if (!isValid) {
-      setError('Please fill in all required fields for all participants');
+      toast.error('Please fill in all required fields for all participants');
       return;
     }
 
     setSubmitting(true);
-    setError('');
 
     try {
       const response = await fetch('/api/register', {
@@ -98,9 +107,17 @@ const RegistrationPage = () => {
         throw new Error(data.error || 'Registration failed');
       }
 
-      setConfirmationCode(data.confirmationCode);
-      setSubmitSuccess(true);
+      // Show success toast with confirmation code
+      toast.success(
+        <div>
+          <p className="font-semibold">Registration Successful!</p>
+          <p className="text-sm mt-1">Confirmation Code: <span className="font-mono font-bold">{data.confirmationCode}</span></p>
+          <p className="text-sm mt-1">A confirmation message has been sent to your email.</p>
+        </div>,
+        { duration: 6000 }
+      );
       
+      // Reset form
       setTimeout(() => {
         setParticipants([{
           id: 1,
@@ -113,19 +130,42 @@ const RegistrationPage = () => {
           paymentType: "Early Bird Y's Man"
         }]);
         setPaymentCode('');
-        setSubmitSuccess(false);
-        setConfirmationCode('');
-      }, 5000);
+      }, 1000);
     } catch (err) {
-      setError(err.message || 'Failed to submit registration');
+      toast.error(err.message || 'Failed to submit registration');
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-  
-       <div className="bg-gradient-to-r from-blue-600 to-green-600 shadow-lg">
+    <div>
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          success: {
+            style: {
+              background: '#10b981',
+              color: 'white',
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#10b981',
+            },
+          },
+          error: {
+            style: {
+              background: '#ef4444',
+              color: 'white',
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#ef4444',
+            },
+          },
+        }}
+      />
+      <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
@@ -135,39 +175,58 @@ const RegistrationPage = () => {
                 className="h-16 w-16 md:h-20 md:w-20 object-contain"
               />
               <div>
-                <h1 className="text-2xl text-white md:text-3xl font-bold">
-                  Kenya District - {"Y's"} Men International
+                <h1 className="text-2xl md:text-3xl font-bold">
+                  Kenya District {"Y's"} Men International
                 </h1>
 
-              <p className="text-blue-100 mt-1">
-                District Conference & Youth Convocation 2026
-              </p>
-
-              {/* Event details */}
-              <div className="flex items-center gap-4 mt-2 text-sm text-blue-100 flex-wrap">
-                <span className="flex items-center gap-1">
-                  <Calendar size={16} />
-                  20th – 21st February 2026
-                </span>
-
-                <span className="flex items-center gap-1">
-                  <MapPin size={16} />
-                  Sky Beach Resort, Kisumu
-                </span>
-              </div>
-
-              {/* Payment details */}
-              <div className="mt-3 text-sm text-blue-100 space-y-1">
-                <p>
-                  <strong>Payment:</strong> M-Pesa to <strong>Jared Musima</strong> -{" "}
-                  <strong>+254720424456</strong>
+                <p className="text-blue-100 mt-1">
+                  District Conference & Youth Convocation 2026
                 </p>
-                <p className="italic text-blue-200">
-                  After payment, please submit the M-Pesa confirmation message on the form.
-                </p>
+
+                {/* Event details */}
+                <div className="flex items-center gap-4 mt-2 text-sm text-blue-100 flex-wrap">
+                  <span className="flex items-center gap-1">
+                    <Calendar size={16} />
+                    20th – 21st February 2026
+                  </span>
+
+                  <span className="flex items-center gap-1">
+                    <MapPin size={16} />
+                    Sky Beach Resort, Kisumu
+                  </span>
+                </div>
+
+                {/* Payment details */}
+                <div className="mt-3 text-sm text-blue-100 space-y-1">
+                  <p className="flex items-center gap-2 flex-wrap">
+                    <span>
+                      <strong>Payment:</strong> M-Pesa to <strong>Jared Musima</strong> -{" "}
+                      <strong>+254720424456</strong>
+                    </span>
+                    <button
+                      onClick={copyPhoneNumber}
+                      className="inline-flex items-center gap-1 bg-white/20 hover:bg-white/30 px-2 py-1 rounded text-xs font-medium transition"
+                      title="Copy phone number"
+                    >
+                      {copied ? (
+                        <>
+                          <Check size={14} />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={14} />
+                          Copy
+                        </>
+                      )}
+                    </button>
+                  </p>
+                  <p className="italic text-blue-200">
+                    After payment, please submit the M-Pesa confirmation message on the form.
+                  </p>
+                </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -176,24 +235,14 @@ const RegistrationPage = () => {
         <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Conference Registration</h2>
           
-          {submitSuccess && (
-            <div className="bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-lg mb-6 flex items-center gap-3">
-              <CheckCircle className="text-green-600 flex-shrink-0" size={24} />
-              <div>
-                <p className="font-semibold">Registration Successful!</p>
-                <p className="text-sm">Confirmation Code: <span className="font-mono font-bold">{confirmationCode}</span></p>
-                <p className="text-sm mt-1">Confirmation emails have been sent to all participants.</p>
-              </div>
-            </div>
-          )}
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-lg mb-6">
-              <p className="font-semibold">Error</p>
-              <p className="text-sm">{error}</p>
-            </div>
-          )}
-
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-blue-800">
+              <strong>💡 Registering Multiple People?</strong> If you're registering others using your email, 
+              you can use email aliases. For Gmail: <span className="font-mono">yourname+person1@gmail.com</span>, 
+              <span className="font-mono">yourname+person2@gmail.com</span>. All emails will arrive in the same inbox!
+            </p>
+          </div>
+          
           <div>
             {participants.map((participant, index) => (
               <div key={participant.id} className="mb-8 pb-8 border-b border-gray-200 last:border-0">

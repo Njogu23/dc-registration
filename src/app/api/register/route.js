@@ -49,6 +49,51 @@ export async function POST(request) {
       }
     }
 
+    // Extract and normalize all emails
+    const emails = participants.map(p => p.email.trim().toLowerCase())
+
+    // Check for duplicate emails within the submission
+    const emailSet = new Set(emails)
+    if (emailSet.size !== emails.length) {
+      return NextResponse.json(
+        { error: 'You have duplicate emails in your submission. Each participant must have a unique email address.' },
+        { status: 400 }
+      )
+    }
+
+    // Check for existing registrations in database
+    const existingRegistrations = await prisma.registration.findMany({
+      where: {
+        email: {
+          in: emails
+        }
+      },
+      select: {
+        email: true,
+        fullName: true,
+        confirmationCode: true
+      }
+    })
+
+    // If any emails already exist, return detailed error
+    if (existingRegistrations.length > 0) {
+      const duplicateDetails = existingRegistrations.map(r => 
+        `${r.fullName} (${r.email})`
+      ).join(', ')
+      
+      return NextResponse.json(
+        { 
+          error: `The following participant(s) are already registered: ${duplicateDetails}. Please use different email addresses or contact support if you believe this is an error.`,
+          duplicates: existingRegistrations.map(r => ({
+            email: r.email,
+            name: r.fullName,
+            confirmationCode: r.confirmationCode
+          }))
+        },
+        { status: 409 }
+      )
+    }
+
     // Generate unique confirmation code
     const confirmationCode = 'YMI' + 
       Date.now().toString(36).toUpperCase() + 
@@ -230,7 +275,7 @@ export async function POST(request) {
     // Handle specific Prisma errors
     if (error.code === 'P2002') {
       return NextResponse.json(
-        { error: 'A participant with this email is already registered' },
+        { error: 'A participant with this email is already registered. Please use a different email address.' },
         { status: 409 }
       )
     }
