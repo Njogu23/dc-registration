@@ -125,7 +125,7 @@ const RegistrationPage = () => {
 
   return (
   
-       <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-lg">
+       <div className="bg-gradient-to-r from-blue-600 to-green-600 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
@@ -135,7 +135,7 @@ const RegistrationPage = () => {
                 className="h-16 w-16 md:h-20 md:w-20 object-contain"
               />
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold">
+                <h1 className="text-2xl text-white md:text-3xl font-bold">
                   Kenya District - {"Y's"} Men International
                 </h1>
 
