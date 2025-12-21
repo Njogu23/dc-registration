@@ -124,14 +124,20 @@ const RegistrationPage = () => {
   };
 
   return (
-    <div>
-      <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-lg">
+  
+       <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold">
-                Kenya District {"Y's"} Men International
-              </h1>
+            <div className="flex items-center gap-4">
+              <img 
+                src="/ysmen-logo.png" 
+                alt="Y's Men International Logo" 
+                className="h-16 w-16 md:h-20 md:w-20 object-contain"
+              />
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold">
+                  Kenya District - {"Y's"} Men International
+                </h1>
 
               <p className="text-blue-100 mt-1">
                 District Conference & Youth Convocation 2026

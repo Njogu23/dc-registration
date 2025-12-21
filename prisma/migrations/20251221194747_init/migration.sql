@@ -1,18 +1,21 @@
 -- CreateTable
 CREATE TABLE "Registration" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "fullName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "designation" TEXT NOT NULL,
     "memberType" TEXT NOT NULL,
     "club" TEXT NOT NULL,
+    "otherClub" TEXT,
     "paymentType" TEXT NOT NULL,
     "paymentCode" TEXT NOT NULL,
     "confirmationCode" TEXT NOT NULL,
     "paymentConfirmed" BOOLEAN NOT NULL DEFAULT false,
     "emailSent" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Registration_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
