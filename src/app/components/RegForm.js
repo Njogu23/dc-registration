@@ -112,7 +112,7 @@ const RegistrationPage = () => {
         <div>
           <p className="font-semibold">Registration Successful!</p>
           <p className="text-sm mt-1">Confirmation Code: <span className="font-mono font-bold">{data.confirmationCode}</span></p>
-          <p className="text-sm mt-1">A confirmation message has been sent to your email.</p>
+          <p className="text-sm mt-1">Confirmation emails have been sent to all participants.</p>
         </div>,
         { duration: 6000 }
       );
@@ -236,10 +236,10 @@ const RegistrationPage = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Conference Registration</h2>
           
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-800">
+            <p className="text-sm text-blue-800 leading-relaxed">
               <strong>💡 Registering Multiple People?</strong> If you're registering others using your email, 
-              you can use email aliases. For Gmail: <span className="font-mono">yourname+person1@gmail.com</span>, 
-              <span className="font-mono">yourname+person2@gmail.com</span>. All emails will arrive in the same inbox!
+              you can use email aliases. For example with Gmail: <span className="font-mono text-xs bg-white px-1 py-0.5 rounded">yourname+person1@gmail.com</span>{' '}
+              or <span className="font-mono text-xs bg-white px-1 py-0.5 rounded">yourname+person2@gmail.com</span>. All emails will arrive in the same inbox!
             </p>
           </div>
           
