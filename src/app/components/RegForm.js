@@ -129,19 +129,39 @@ const RegistrationPage = () => {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Kenya District {"Y's"} Men International</h1>
-              <p className="text-blue-100 mt-1">District Conference & Youth Convocation 2026</p>
+              <h1 className="text-2xl md:text-3xl font-bold">
+                Kenya District {"Y's"} Men International
+              </h1>
+
+              <p className="text-blue-100 mt-1">
+                District Conference & Youth Convocation 2026
+              </p>
+
+              {/* Event details */}
               <div className="flex items-center gap-4 mt-2 text-sm text-blue-100 flex-wrap">
                 <span className="flex items-center gap-1">
                   <Calendar size={16} />
-                  20th - 21st February 2026
+                  20th – 21st February 2026
                 </span>
+
                 <span className="flex items-center gap-1">
                   <MapPin size={16} />
                   Sky Beach Resort, Kisumu
                 </span>
               </div>
+
+              {/* Payment details */}
+              <div className="mt-3 text-sm text-blue-100 space-y-1">
+                <p>
+                  <strong>Payment:</strong> M-Pesa to <strong>Jared Musima</strong> -{" "}
+                  <strong>+254720424456</strong>
+                </p>
+                <p className="italic text-blue-200">
+                  After payment, please submit the M-Pesa confirmation message on the form.
+                </p>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
