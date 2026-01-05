@@ -2,7 +2,7 @@
 
 "use client"
 import React, { useState, useEffect } from 'react'
-import { Search, Filter, Mail, CheckCircle, XCircle, Users, RefreshCw, Copy, Check } from 'lucide-react'
+import { Search, Filter, Mail, CheckCircle, XCircle, Users, RefreshCw, Copy, Check, Phone, Briefcase, Home } from 'lucide-react'
 import { paymentTypes } from '@/data/paymentTypes'
 
 const AdminPage = () => {
@@ -12,6 +12,7 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
+  const [expandedRows, setExpandedRows] = useState(new Set())
 
   useEffect(() => {
     fetchRegistrations()
@@ -103,98 +104,91 @@ const AdminPage = () => {
     }
   }
 
+  const toggleRowExpansion = (id) => {
+    const newExpanded = new Set(expandedRows)
+    if (newExpanded.has(id)) {
+      newExpanded.delete(id)
+    } else {
+      newExpanded.add(id)
+    }
+    setExpandedRows(newExpanded)
+  }
+
   const copyFormattedLists = () => {
-  // Better filtering logic that matches your actual memberType values
-  const ysMen = registrations.filter(r => {
-    const memberType = r.memberType.toLowerCase();
-    return (
-      memberType.includes('men') || 
-      memberType.includes('member') ||
-      memberType.includes('adult') ||
-      memberType === "y's men" ||
-      memberType === "y's men member" ||
-      memberType === "ys men" ||
-      !memberType.includes('youth') // If it's not youth, assume it's men
-    );
-  });
-  
-  const ysYouth = registrations.filter(r => {
-    const memberType = r.memberType.toLowerCase();
-    return (
-      memberType.includes('youth') ||
-      memberType === "y's youth" ||
-      memberType === "ys youth"
-    );
-  });
-
-  console.log('Debug - All registrations:', registrations);
-  console.log('Debug - Y\'s Men count:', ysMen.length);
-  console.log('Debug - Y\'s Youth count:', ysYouth.length);
-  console.log('Debug - Member types found:', [...new Set(registrations.map(r => r.memberType))]);
-
-  // Format the text
-  let formattedText = "*Y's Men List*\n";
-  
-  // Add Y's Men
-  if (ysMen.length > 0) {
-    ysMen.forEach(reg => {
-      const status = reg.paymentConfirmed ? '✅' : '❌';
-      // Handle club name - use otherClub if club is "Other"
-      const clubDisplay = reg.club === 'Other' && reg.otherClub 
-        ? reg.otherClub 
-        : reg.club;
-      formattedText += `${reg.designation} ${reg.fullName}  -  ${clubDisplay} ${status}\n`;
+    const ysMen = registrations.filter(r => {
+      const memberType = r.memberType.toLowerCase();
+      return (
+        memberType.includes('men') || 
+        memberType.includes('member') ||
+        memberType.includes('adult') ||
+        memberType === "y's men" ||
+        memberType === "y's men member" ||
+        memberType === "ys men" ||
+        !memberType.includes('youth')
+      );
     });
-  } else {
-    formattedText += "No Y's Men registrations\n";
-  }
-  
-  // Add separator
-  formattedText += "\n";
-  formattedText += "----------------------\n";
-  formattedText += "\n";
-  
-  // Add Y's Youth
-  formattedText += "*Y's Youth List*\n";
-  if (ysYouth.length > 0) {
-    ysYouth.forEach(reg => {
-      const status = reg.paymentConfirmed ? '✅' : '❌';
-      // Handle club name - use otherClub if club is "Other"
-      const clubDisplay = reg.club === 'Other' && reg.otherClub 
-        ? reg.otherClub 
-        : reg.club;
-      formattedText += `${reg.designation} ${reg.fullName}  -  ${clubDisplay} ${status}\n`;
+    
+    const ysYouth = registrations.filter(r => {
+      const memberType = r.memberType.toLowerCase();
+      return (
+        memberType.includes('youth') ||
+        memberType === "y's youth" ||
+        memberType === "ys youth"
+      );
     });
-  } else {
-    formattedText += "No Y's Youth registrations\n";
+
+    let formattedText = "*Y's Men List*\n";
+    
+    if (ysMen.length > 0) {
+      ysMen.forEach(reg => {
+        const status = reg.paymentConfirmed ? '✅' : '❌';
+        const clubDisplay = reg.club === 'Other' && reg.otherClub 
+          ? reg.otherClub 
+          : reg.club;
+        formattedText += `${reg.designation} ${reg.fullName}  -  ${clubDisplay} ${status}\n`;
+      });
+    } else {
+      formattedText += "No Y's Men registrations\n";
+    }
+    
+    formattedText += "\n";
+    formattedText += "----------------------\n";
+    formattedText += "\n";
+    
+    formattedText += "*Y's Youth List*\n";
+    if (ysYouth.length > 0) {
+      ysYouth.forEach(reg => {
+        const status = reg.paymentConfirmed ? '✅' : '❌';
+        const clubDisplay = reg.club === 'Other' && reg.otherClub 
+          ? reg.otherClub 
+          : reg.club;
+        formattedText += `${reg.designation} ${reg.fullName}  -  ${clubDisplay} ${status}\n`;
+      });
+    } else {
+      formattedText += "No Y's Youth registrations\n";
+    }
+    formattedText += "\n";
+    formattedText += "----------------------\n";
+    formattedText += "\n";
+    formattedText += `\nTotal: ${registrations.length} registration${registrations.length !== 1 ? 's' : ''} (${ysMen.length} Y's Men, ${ysYouth.length} Y's Youth)`;
+    formattedText += `\nConfirmed: ${registrations.filter(r => r.paymentConfirmed).length}`;
+    formattedText += `\nPending: ${registrations.filter(r => !r.paymentConfirmed).length}`;
+
+    navigator.clipboard.writeText(formattedText).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(err => {
+      console.error('Failed to copy:', err);
+      const textArea = document.createElement('textarea');
+      textArea.value = formattedText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   }
-   formattedText += "\n";
-  formattedText += "----------------------\n";
-  formattedText += "\n";
-  // Add summary
-  formattedText += `\nTotal: ${registrations.length} registration${registrations.length !== 1 ? 's' : ''} (${ysMen.length} Y's Men, ${ysYouth.length} Y's Youth)`;
-  formattedText += `\nConfirmed: ${registrations.filter(r => r.paymentConfirmed).length}`;
-  formattedText += `\nPending: ${registrations.filter(r => !r.paymentConfirmed).length}`;
-
-  console.log('Debug - Formatted text:', formattedText);
-
-  // Copy to clipboard
-  navigator.clipboard.writeText(formattedText).then(() => {
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }).catch(err => {
-    console.error('Failed to copy:', err);
-    // Fallback for older browsers
-    const textArea = document.createElement('textarea');
-    textArea.value = formattedText;
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textArea);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  });
-}
 
   const groupedRegistrations = registrations.reduce((acc, reg) => {
     if (!acc[reg.confirmationCode]) {
@@ -349,71 +343,132 @@ const AdminPage = () => {
                       <thead className="bg-gray-100">
                         <tr>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Name</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Email</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Contact</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Club</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Member Type</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Amount</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Payment</th>
                           <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Email</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Details</th>
                         </tr>
                       </thead>
                       <tbody>
                         {regs.map((reg) => {
                           const payment = paymentTypes[reg.memberType]?.find(pt => pt.label === reg.paymentType)
+                          const isExpanded = expandedRows.has(reg.id)
+                          
                           return (
-                            <tr key={reg.id} className="border-t border-gray-200 hover:bg-gray-50">
-                              <td className="px-4 py-3">
-                                <div>
-                                  <div className="font-medium text-gray-900">{reg.fullName}</div>
-                                  <div className="text-sm text-gray-500">{reg.designation}</div>
-                                </div>
-                              </td>
-                              <td className="px-4 py-3 text-sm text-gray-700">{reg.email}</td>
-                              <td className="px-4 py-3 text-sm text-gray-700">
-                                {reg.club === 'Other' && reg.otherClub 
-                                  ? `${reg.club} (${reg.otherClub})` 
-                                  : reg.club}
-                              </td>
-                              <td className="px-4 py-3 text-sm text-gray-700">{reg.memberType}</td>
-                              <td className="px-4 py-3 text-sm font-semibold text-gray-900">
-                                KES {payment?.amount.toLocaleString() || 'N/A'}
-                              </td>
-                              <td className="px-4 py-3">
-                                <button
-                                  onClick={() => togglePaymentStatus(reg.id, reg.paymentConfirmed)}
-                                  className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                                    reg.paymentConfirmed
-                                      ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                                      : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                                  }`}
-                                >
-                                  {reg.paymentConfirmed ? (
-                                    <>
-                                      <CheckCircle size={14} />
-                                      Confirmed
-                                    </>
-                                  ) : (
-                                    <>
-                                      <XCircle size={14} />
-                                      Pending
-                                    </>
-                                  )}
-                                </button>
-                              </td>
-                              <td className="px-4 py-3">
-                                <button
-                                  onClick={() => toggleEmailStatus(reg.id, reg.emailSent)}
-                                  className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                                    reg.emailSent
-                                      ? 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-                                      : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                                  }`}
-                                >
-                                  <Mail size={14} />
-                                  {reg.emailSent ? 'Sent' : 'Not Sent'}
-                                </button>
-                              </td>
-                            </tr>
+                            <React.Fragment key={reg.id}>
+                              <tr className="border-t border-gray-200 hover:bg-gray-50">
+                                <td className="px-4 py-3">
+                                  <div>
+                                    <div className="font-medium text-gray-900">{reg.fullName}</div>
+                                    <div className="text-sm text-gray-500">{reg.designation}</div>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <div className="text-sm space-y-1">
+                                    <div className="text-gray-700">{reg.email}</div>
+                                    {reg.telephone && (
+                                      <div className="flex items-center gap-1 text-gray-600">
+                                        <Phone size={12} />
+                                        {reg.telephone}
+                                      </div>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-700">
+                                  {reg.club === 'Other' && reg.otherClub 
+                                    ? `${reg.club} (${reg.otherClub})` 
+                                    : reg.club}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-700">{reg.memberType}</td>
+                                <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                                  KES {payment?.amount.toLocaleString() || 'N/A'}
+                                </td>
+                                <td className="px-4 py-3">
+                                  <button
+                                    onClick={() => togglePaymentStatus(reg.id, reg.paymentConfirmed)}
+                                    className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                                      reg.paymentConfirmed
+                                        ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                                        : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                                    }`}
+                                  >
+                                    {reg.paymentConfirmed ? (
+                                      <>
+                                        <CheckCircle size={14} />
+                                        Confirmed
+                                      </>
+                                    ) : (
+                                      <>
+                                        <XCircle size={14} />
+                                        Pending
+                                      </>
+                                    )}
+                                  </button>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <button
+                                    onClick={() => toggleEmailStatus(reg.id, reg.emailSent)}
+                                    className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                                      reg.emailSent
+                                        ? 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                                    }`}
+                                  >
+                                    <Mail size={14} />
+                                    {reg.emailSent ? 'Sent' : 'Not Sent'}
+                                  </button>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <button
+                                    onClick={() => toggleRowExpansion(reg.id)}
+                                    className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                                  >
+                                    {isExpanded ? 'Hide' : 'Show'}
+                                  </button>
+                                </td>
+                              </tr>
+                              {isExpanded && (
+                                <tr className="bg-blue-50">
+                                  <td colSpan="8" className="px-4 py-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                      {reg.profession && (
+                                        <div className="flex items-start gap-2">
+                                          <Briefcase size={16} className="text-gray-500 mt-0.5 flex-shrink-0" />
+                                          <div>
+                                            <div className="font-medium text-gray-700">Profession</div>
+                                            <div className="text-gray-600">{reg.profession}</div>
+                                          </div>
+                                        </div>
+                                      )}
+                                      {reg.residentialAddress && (
+                                        <div className="flex items-start gap-2">
+                                          <Home size={16} className="text-gray-500 mt-0.5 flex-shrink-0" />
+                                          <div>
+                                            <div className="font-medium text-gray-700">Residential Address</div>
+                                            <div className="text-gray-600">{reg.residentialAddress}</div>
+                                          </div>
+                                        </div>
+                                      )}
+                                      <div>
+                                        <div className="font-medium text-gray-700">Registration Date</div>
+                                        <div className="text-gray-600">
+                                          {new Date(reg.createdAt).toLocaleDateString('en-KE', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                          })}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                            </React.Fragment>
                           )
                         })}
                       </tbody>

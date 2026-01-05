@@ -41,7 +41,8 @@ export async function POST(request) {
 
     // Validate each participant
     for (const participant of participants) {
-      if (!participant.fullName || !participant.email || !participant.club) {
+      if (!participant.fullName || !participant.email || !participant.telephone || 
+          !participant.profession || !participant.residentialAddress || !participant.club) {
         return NextResponse.json(
           { error: 'All required fields must be filled for each participant' },
           { status: 400 }
@@ -106,6 +107,9 @@ export async function POST(request) {
         data: {
           fullName: participant.fullName.trim(),
           email: participant.email.trim().toLowerCase(),
+          telephone: participant.telephone?.trim() || null,
+          profession: participant.profession?.trim() || null,
+          residentialAddress: participant.residentialAddress?.trim() || null,
           designation: participant.designation?.trim() || '',
           memberType: participant.memberType,
           club: participant.club,
@@ -146,6 +150,9 @@ export async function POST(request) {
               <h3 style="margin-top: 0;">Your Registration Details</h3>
               <p><strong>Name:</strong> ${registration.fullName}</p>
               <p><strong>Email:</strong> ${registration.email}</p>
+              <p><strong>Telephone:</strong> ${registration.telephone || 'N/A'}</p>
+              <p><strong>Profession:</strong> ${registration.profession || 'N/A'}</p>
+              <p><strong>Address:</strong> ${registration.residentialAddress || 'N/A'}</p>
               <p><strong>Designation:</strong> ${registration.designation || 'N/A'}</p>
               <p><strong>Club:</strong> ${registration.club}</p>
               <p><strong>Member Type:</strong> ${registration.memberType}</p>
@@ -196,6 +203,7 @@ export async function POST(request) {
           `<tr>
             <td style="padding: 8px; border: 1px solid #e5e7eb;">${r.fullName}</td>
             <td style="padding: 8px; border: 1px solid #e5e7eb;">${r.email}</td>
+            <td style="padding: 8px; border: 1px solid #e5e7eb;">${r.telephone || 'N/A'}</td>
             <td style="padding: 8px; border: 1px solid #e5e7eb;">${r.club}</td>
             <td style="padding: 8px; border: 1px solid #e5e7eb;">${r.memberType}</td>
           </tr>`
@@ -220,6 +228,7 @@ export async function POST(request) {
                 <tr style="background: #f3f4f6;">
                   <th style="padding: 12px; border: 1px solid #e5e7eb; text-align: left;">Name</th>
                   <th style="padding: 12px; border: 1px solid #e5e7eb; text-align: left;">Email</th>
+                  <th style="padding: 12px; border: 1px solid #e5e7eb; text-align: left;">Phone</th>
                   <th style="padding: 12px; border: 1px solid #e5e7eb; text-align: left;">Club</th>
                   <th style="padding: 12px; border: 1px solid #e5e7eb; text-align: left;">Type</th>
                 </tr>

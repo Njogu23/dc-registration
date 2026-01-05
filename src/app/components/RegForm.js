@@ -12,6 +12,9 @@ const RegistrationPage = () => {
     id: 1,
     fullName: '',
     email: '',
+    telephone: '',
+    profession: '',
+    residentialAddress: '',
     designation: '',
     memberType: "Y's Man",
     club: '',
@@ -38,6 +41,9 @@ const RegistrationPage = () => {
       id: participants.length + 1,
       fullName: '',
       email: '',
+      telephone: '',
+      profession: '',
+      residentialAddress: '',
       designation: '',
       memberType: "Y's Man",
       club: '',
@@ -75,9 +81,11 @@ const RegistrationPage = () => {
   };
 
   const handleSubmit = async () => {
-    // Validate all fields including otherClub when club is "Other"
+    // Validate all required fields including otherClub when club is "Other"
     const isValid = participants.every(p => {
-      const basicFieldsValid = p.fullName && p.email && p.designation && p.club;
+      const basicFieldsValid = p.fullName && p.email && p.telephone && 
+                               p.profession && p.residentialAddress && 
+                               p.designation && p.club;
       const otherClubValid = p.club === 'Other' ? p.otherClub.trim() !== '' : true;
       return basicFieldsValid && otherClubValid && paymentCode;
     });
@@ -123,6 +131,9 @@ const RegistrationPage = () => {
           id: 1,
           fullName: '',
           email: '',
+          telephone: '',
+          profession: '',
+          residentialAddress: '',
           designation: '',
           memberType: "Y's Man",
           club: '',
@@ -265,7 +276,7 @@ const RegistrationPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name *
+                      Full Name *(as you would like it on your badge)
                     </label>
                     <input
                       type="text"
@@ -284,6 +295,45 @@ const RegistrationPage = () => {
                       value={participant.email}
                       onChange={(e) => updateParticipant(participant.id, 'email', e.target.value)}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Telephone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      value={participant.telephone}
+                      onChange={(e) => updateParticipant(participant.id, 'telephone', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="e.g., +254712345678"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Profession *
+                    </label>
+                    <input
+                      type="text"
+                      value={participant.profession}
+                      onChange={(e) => updateParticipant(participant.id, 'profession', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="e.g., Teacher, Engineer, Student"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Residential Address *
+                    </label>
+                    <input
+                      type="text"
+                      value={participant.residentialAddress}
+                      onChange={(e) => updateParticipant(participant.id, 'residentialAddress', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="e.g., Nairobi, Kenya"
                     />
                   </div>
 
