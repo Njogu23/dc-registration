@@ -110,7 +110,7 @@ export async function POST(request) {
           telephone: participant.telephone?.trim() || null,
           profession: participant.profession?.trim() || null,
           residentialAddress: participant.residentialAddress?.trim() || null,
-          designation: participant.designation?.trim() || '',
+          designation: participant.designation?.trim() || null,
           memberType: participant.memberType,
           club: participant.club,
           otherClub: participant.club === 'Other' ? participant.otherClub?.trim() : null,
