@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 
@@ -54,7 +54,7 @@ const TYPE_CONFIG = {
   logistics:{ bg: '#f9fafb', border: '#e5e7eb', tag: '#6b7280', tagBg: '#f3f4f6', label: 'Logistics',  timeColor: '#6b7280', actBold: false },
 }
 
-export default function ProgramPage() {
+function ProgramContent() {
   const [activeDay, setActiveDay] = useState(0)
   const searchParams = useSearchParams()
   const isPrint = searchParams.get('print') === '1'
@@ -187,6 +187,21 @@ export default function ProgramPage() {
         </div>
       </div>
     </>
+  )
+}
+
+export default function ProgramPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <svg className="w-6 h-6 animate-spin text-[#0d2055]" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+        </svg>
+      </div>
+    }>
+      <ProgramContent />
+    </Suspense>
   )
 }
 
