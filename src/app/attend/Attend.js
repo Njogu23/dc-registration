@@ -27,7 +27,7 @@ export default function AttendPage() {
   const [loading,       setLoading]       = useState(false)
   const [error,         setError]         = useState('')
   const [showWalkin,    setShowWalkin]    = useState(false)
-  const [walkin,        setWalkin]        = useState({ fullName: '', email: '', club: '', memberType: '' })
+  const [walkin,        setWalkin]        = useState({ fullName: '', email: '', designation: '', club: '', memberType: '' })
   const [walkinLoading, setWalkinLoading] = useState(false)
   const [walkinError,   setWalkinError]   = useState('')
 
@@ -96,6 +96,13 @@ export default function AttendPage() {
       setWalkinLoading(false)
     }
   }
+
+  const walkinValid =
+    walkin.fullName &&
+    walkin.email &&
+    walkin.designation &&
+    walkin.club &&
+    (!needsMemberType || walkin.memberType)
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-950 via-blue-950 to-slate-900 font-serif p-6 relative overflow-hidden">
@@ -196,41 +203,67 @@ export default function AttendPage() {
             </p>
 
             <form onSubmit={handleWalkin} className="flex flex-col gap-3">
+
+              {/* Full Name */}
               <div className="relative">
                 <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300/40 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                 </svg>
-                <input className="w-full bg-white/5 border border-white/10 rounded-lg py-3.5 pl-10 pr-3.5 text-white font-sans text-sm outline-none transition-all focus:border-blue-400/60 focus:bg-white/10 placeholder:text-blue-200/40" 
-                  type="text" 
+                <input
+                  className="w-full bg-white/5 border border-white/10 rounded-lg py-3.5 pl-10 pr-3.5 text-white font-sans text-sm outline-none transition-all focus:border-blue-400/60 focus:bg-white/10 placeholder:text-blue-200/40"
+                  type="text"
                   placeholder="Full Name"
                   value={walkin.fullName}
                   onChange={e => setWalkin(w => ({ ...w, fullName: e.target.value }))}
-                  required />
+                  required
+                />
               </div>
 
+              {/* Email */}
               <div className="relative">
                 <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300/40 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                   <polyline points="22,6 12,13 2,6"/>
                 </svg>
-                <input className="w-full bg-white/5 border border-white/10 rounded-lg py-3.5 pl-10 pr-3.5 text-white font-sans text-sm outline-none transition-all focus:border-blue-400/60 focus:bg-white/10 placeholder:text-blue-200/40" 
-                  type="email" 
+                <input
+                  className="w-full bg-white/5 border border-white/10 rounded-lg py-3.5 pl-10 pr-3.5 text-white font-sans text-sm outline-none transition-all focus:border-blue-400/60 focus:bg-white/10 placeholder:text-blue-200/40"
+                  type="email"
                   placeholder="Email Address"
                   value={walkin.email}
                   onChange={e => setWalkin(w => ({ ...w, email: e.target.value }))}
-                  required />
+                  required
+                />
               </div>
 
+              {/* Designation */}
+              <div className="relative">
+                <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300/40 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                </svg>
+                <input
+                  className="w-full bg-white/5 border border-white/10 rounded-lg py-3.5 pl-10 pr-3.5 text-white font-sans text-sm outline-none transition-all focus:border-blue-400/60 focus:bg-white/10 placeholder:text-blue-200/40"
+                  type="text"
+                  placeholder="Designation (e.g. CP, DG, PDG, Y's Man)"
+                  value={walkin.designation}
+                  onChange={e => setWalkin(w => ({ ...w, designation: e.target.value }))}
+                  required
+                />
+              </div>
+
+              {/* Club */}
               <div className="relative">
                 <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300/40 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                   <circle cx="9" cy="7" r="4"/>
                   <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                 </svg>
-                <select className="w-full bg-white/5 border border-white/10 rounded-lg py-3.5 pl-10 pr-3.5 text-white font-sans text-sm outline-none transition-all focus:border-blue-400/60 focus:bg-white/10 cursor-pointer"
+                <select
+                  className="w-full bg-white/5 border border-white/10 rounded-lg py-3.5 pl-10 pr-3.5 text-white font-sans text-sm outline-none transition-all focus:border-blue-400/60 focus:bg-white/10 cursor-pointer"
                   value={walkin.club}
                   onChange={e => setWalkin(w => ({ ...w, club: e.target.value, memberType: '' }))}
-                  required>
+                  required
+                >
                   <option value="" className="bg-slate-800 text-white/70">Select your Club</option>
                   {CLUB_GROUPS.map(g => (
                     <optgroup key={g.label} label={g.label} className="bg-slate-800 text-white/90">
@@ -240,6 +273,7 @@ export default function AttendPage() {
                 </select>
               </div>
 
+              {/* Member type toggle — only when club is in both lists */}
               {needsMemberType && (
                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-3.5 animate-[fadeIn_0.25s_ease]">
                   <p className="font-sans text-xs text-blue-200/60 mb-2.5 leading-relaxed">
@@ -247,11 +281,14 @@ export default function AttendPage() {
                   </p>
                   <div className="flex gap-2">
                     {["Y's Men", "YS Youth"].map(t => (
-                      <button key={t} type="button"
+                      <button
+                        key={t}
+                        type="button"
                         className={`flex-1 py-2 px-2 bg-white/5 border border-white/10 rounded-lg text-blue-200/70 font-sans text-sm cursor-pointer transition-all hover:bg-white/10 hover:border-blue-400/40 hover:text-white ${
                           walkin.memberType === t ? 'bg-blue-500/20 border-blue-400/60 text-white font-semibold' : ''
                         }`}
-                        onClick={() => setWalkin(w => ({ ...w, memberType: t }))}>
+                        onClick={() => setWalkin(w => ({ ...w, memberType: t }))}
+                      >
                         {t === "Y's Men" ? '👔' : '🌱'} {t}
                       </button>
                     ))}
@@ -266,9 +303,11 @@ export default function AttendPage() {
                 </div>
               )}
 
-              <button className="w-full py-3.5 rounded-lg font-sans font-semibold flex items-center justify-center gap-2 transition-all hover:opacity-90 hover:-translate-y-px disabled:opacity-40 disabled:cursor-not-allowed bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-[0_4px_20px_rgba(245,158,11,0.3)] hover:shadow-[0_6px_28px_rgba(245,158,11,0.5)]"
+              <button
+                className="w-full py-3.5 rounded-lg font-sans font-semibold flex items-center justify-center gap-2 transition-all hover:opacity-90 hover:-translate-y-px disabled:opacity-40 disabled:cursor-not-allowed bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-[0_4px_20px_rgba(245,158,11,0.3)] hover:shadow-[0_6px_28px_rgba(245,158,11,0.5)]"
                 type="submit"
-                disabled={walkinLoading || !walkin.fullName || !walkin.email || !walkin.club || (needsMemberType && !walkin.memberType)}>
+                disabled={walkinLoading || !walkinValid}
+              >
                 {walkinLoading ? (
                   <span className="inline-block w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
                 ) : (

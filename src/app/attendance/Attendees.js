@@ -151,7 +151,8 @@ export default function AttendeesPage() {
                   <tr className="bg-gray-50 border-b-2 border-red-600">
                     <th className="text-left text-[10px] font-bold tracking-wider uppercase text-gray-500 px-4 py-2.5">#</th>
                     <th className="text-left text-[10px] font-bold tracking-wider uppercase text-gray-500 px-4 py-2.5">Name</th>
-                    <th className="text-left text-[10px] font-bold tracking-wider uppercase text-gray-500 px-4 py-2.5 hidden sm:table-cell">Club</th>
+                    <th className="text-left text-[10px] font-bold tracking-wider uppercase text-gray-500 px-4 py-2.5 hidden sm:table-cell">Designation</th>
+                    <th className="text-left text-[10px] font-bold tracking-wider uppercase text-gray-500 px-4 py-2.5 hidden md:table-cell">Club</th>
                     <th className="text-left text-[10px] font-bold tracking-wider uppercase text-gray-500 px-4 py-2.5 hidden md:table-cell">Type</th>
                     <th className="text-left text-[10px] font-bold tracking-wider uppercase text-gray-500 px-4 py-2.5">Checked In</th>
                   </tr>
@@ -162,13 +163,13 @@ export default function AttendeesPage() {
                       <td className="px-4 py-3 text-gray-400 text-xs w-8">{i + 1}</td>
                       <td className="px-4 py-3">
                         <p className="font-semibold text-[#0d2055] leading-tight">{a.fullName}</p>
-                        {a.designation && (
-                          <p className="text-xs text-gray-400 mt-0.5">{a.designation}</p>
-                        )}
                         {/* Club shown on mobile only */}
                         <p className="text-xs text-gray-500 mt-0.5 sm:hidden">{a.club}</p>
                       </td>
-                      <td className="px-4 py-3 text-gray-600 hidden sm:table-cell">{a.club}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell">
+                        <p className="text-gray-700 text-sm">{a.designation || <span className="text-gray-300">—</span>}</p>
+                      </td>
+                      <td className="px-4 py-3 text-gray-600 hidden md:table-cell">{a.club}</td>
                       <td className="px-4 py-3 hidden md:table-cell">
                         <MemberBadge type={a.memberType} />
                       </td>
