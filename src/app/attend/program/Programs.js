@@ -43,7 +43,6 @@ const PROGRAMME = [
   },
 ]
 
-// On white background: use solid-ish tints instead of dark rgba
 const TYPE_CONFIG = {
   keynote:  { bg: '#fff0f2', border: '#f5b8c4', tag: '#c8102e', tagBg: '#fde0e5', label: 'Keynote',    timeColor: '#9b1428', actBold: true  },
   ceremony: { bg: '#f0f4ff', border: '#c0cdf7', tag: '#1a3a7a', tagBg: '#dde5f9', label: 'Ceremony',   timeColor: '#1a3a7a', actBold: false },
@@ -65,13 +64,9 @@ export default function ProgramPage() {
         @media print {
           .no-print { display: none !important; }
           body { background: white !important; }
-          .root { background: white !important; padding: 0 !important; }
-          .content { padding: 16px !important; max-width: 100% !important; gap: 12px !important; }
-          .tabs { display: none !important; }
-          .date-rule { display: none !important; }
-          .screen-only { display: none !important; }
           .print-all { display: flex !important; }
-
+          .screen-only { display: none !important; }
+          
           /* Adjust grid for portrait */
           .table-head {
             grid-template-columns: 120px 1fr 180px 150px !important;
@@ -121,30 +116,30 @@ export default function ProgramPage() {
         }
       `}</style>
 
-      <div className="root">
-        <div className="content">
+      <div className="min-h-screen bg-gray-100 font-sans py-7 px-4 md:py-8 md:px-4">
+        <div className="max-w-4xl mx-auto flex flex-col gap-5">
 
           {/* ── HEADER ─────────────────────────────────────────── */}
-          <div className="header">
-            <div className="logo-banner">
-              <div className="logo-img-wrap">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="bg-[#0d2055] flex items-center gap-4 p-3.5 md:p-4 flex-wrap">
+              <div className="bg-white rounded-lg p-1.5 md:p-2 flex items-center flex-shrink-0">
                 <Image
                   src="/ysmen-logo.png"
                   alt="Y's Men International"
                   width={180}
                   height={64}
-                  style={{ objectFit: 'contain', display: 'block' }}
+                  className="object-contain block"
                   priority
                 />
               </div>
-              <div className="logo-divider" />
-              <div className="logo-text">
-                <span className="logo-top">Kenya District Conference</span>
-                <span className="logo-bottom">22nd Annual · 2026</span>
+              <div className="w-px h-9 bg-white/20 flex-shrink-0" />
+              <div className="flex flex-col gap-0.5 flex-1">
+                <span className="text-sm md:text-base font-bold text-white tracking-tight">Kenya District Conference</span>
+                <span className="text-[11px] text-red-500/90 uppercase tracking-wider">22nd Annual · 2026</span>
               </div>
 
               {/* Download button — screen only */}
-              <button className="dl-btn no-print" onClick={() => window.print()}>
+              <button className="no-print inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 border-none rounded-lg px-4 py-2.5 text-white text-xs md:text-sm font-semibold cursor-pointer whitespace-nowrap flex-shrink-0 transition-all hover:-translate-y-px shadow-md" onClick={() => window.print()}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                   <polyline points="7 10 12 15 17 10"/>
@@ -154,177 +149,68 @@ export default function ProgramPage() {
               </button>
             </div>
 
-            <div className="conf-meta">
-              <h1 className="conf-title">The 22<sup>nd</sup> Kenya District Conference Programme</h1>
-              <div className="conf-details">
+            <div className="p-4 md:p-5">
+              <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-[#0d2055] font-serif mb-2 tracking-tight">
+                The 22<sup className="text-xs align-super">nd</sup> Kenya District Conference Programme
+              </h1>
+              <div className="flex flex-wrap gap-1.5 md:gap-3.5 text-xs md:text-sm text-gray-700 mb-1.5">
                 <span>📅 20th–21st February 2026</span>
-                <span className="sep">·</span>
+                <span className="text-red-600">·</span>
                 <span>📍 Sky Beach Resort, Kisumu</span>
               </div>
-              <div className="conf-theme">
-                <span className="theme-label">Theme:</span>
-                <span className="theme-text">"{THEME}"</span>
+              <div className="flex items-baseline gap-1.5 md:gap-2 text-xs md:text-sm">
+                <span className="font-bold text-[#0d2055]">Theme:</span>
+                <span className="text-red-600 italic font-serif">"{THEME}"</span>
               </div>
             </div>
           </div>
 
           {/* ── DAY TABS (screen only) ──────────────────────────── */}
-          <div className="tabs no-print">
+          <div className="no-print flex gap-2.5">
             {PROGRAMME.map((d, i) => (
               <button
                 key={i}
-                className={`tab ${activeDay === i ? 'tab--on' : ''}`}
+                className={`flex-1 bg-white border border-gray-200 rounded-xl p-3 md:p-4 cursor-pointer text-center transition-all flex flex-col gap-1 shadow-sm ${
+                  activeDay === i 
+                    ? 'bg-red-50 border-red-600 shadow-[0_0_0_3px_rgba(200,16,46,0.1)]' 
+                    : 'hover:border-red-300 hover:bg-red-50/50'
+                }`}
                 onClick={() => setActiveDay(i)}
               >
-                <span className="tab-day">{d.day}</span>
-                <span className="tab-date">{d.date.split(',')[0]}</span>
+                <span className="text-[10px] md:text-xs font-bold tracking-wider uppercase text-red-600">{d.day}</span>
+                <span className="text-xs md:text-sm font-semibold text-[#0d2055]">{d.date.split(',')[0]}</span>
               </button>
             ))}
           </div>
 
           {/* ── SCREEN: active day only ─────────────────────────── */}
           <div className="screen-only">
-            <div className="date-rule">
-              <div className="rule-line" />
-              <span className="rule-text">{prog.date}</span>
-              <div className="rule-line" />
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-gray-200" />
+              <span className="text-[11px] text-gray-400 tracking-wide whitespace-nowrap">{prog.date}</span>
+              <div className="flex-1 h-px bg-gray-200" />
             </div>
             <SessionBlock sessions={prog.sessions} />
           </div>
 
           {/* ── PRINT: all days ─────────────────────────────────── */}
-          <div className="print-all" style={{ display: 'none', flexDirection: 'column', gap: '20px' }}>
+          <div className="print-all hidden flex-col gap-5">
             {PROGRAMME.map((d, i) => (
               <div key={i} className="day-block">
-                <div className="print-day-heading" style={{ display: 'none', alignItems: 'center', gap: 14, background: '#0d2055', padding: '9px 16px', borderRadius: '10px 10px 0 0', marginBottom: 0 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: 'white', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{d.day}</span>
-                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>{d.date}</span>
+                <div className="hidden print-day-heading items-center gap-3.5 bg-[#0d2055] px-4 py-2 rounded-t-lg mb-0">
+                  <span className="text-[11px] font-bold text-white uppercase tracking-wider">{d.day}</span>
+                  <span className="text-[11px] text-white/60">{d.date}</span>
                 </div>
                 <SessionBlock sessions={d.sessions} />
               </div>
             ))}
           </div>
 
-          <p className="footer">Kenya District · Y's Men International · 2026</p>
+          <p className="text-center text-xs text-gray-400 tracking-wide pt-1">
+            Kenya District · Y's Men International · 2026
+          </p>
         </div>
       </div>
-
-      <style jsx>{`
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        /* ── Root: WHITE background ── */
-        .root {
-          min-height: 100vh;
-          background: #f0f2f7;
-          font-family: 'Segoe UI', 'Trebuchet MS', Arial, sans-serif;
-          padding: 28px 16px 60px;
-        }
-
-        .content {
-          max-width: 960px;
-          margin: 0 auto;
-          display: flex; flex-direction: column; gap: 20px;
-        }
-
-        /* ── Header card ── */
-        .header {
-          background: white;
-          border-radius: 14px;
-          border: 1px solid #e2e6ed;
-          box-shadow: 0 2px 12px rgba(13,32,85,0.07);
-          overflow: hidden;
-        }
-
-        .logo-banner {
-          background: #0d2055;
-          display: flex; align-items: center;
-          gap: 16px; padding: 14px 20px;
-          flex-wrap: wrap;
-        }
-        .logo-img-wrap {
-          background: white;
-          border-radius: 8px;
-          padding: 6px 12px;
-          display: flex; align-items: center;
-          flex-shrink: 0;
-        }
-        .logo-divider {
-          width: 1px; height: 36px;
-          background: rgba(255,255,255,0.2);
-          flex-shrink: 0;
-        }
-        .logo-text { display: flex; flex-direction: column; gap: 3px; flex: 1; }
-        .logo-top  { font-size: 15px; font-weight: 700; color: white; letter-spacing: 0.01em; }
-        .logo-bottom { font-size: 11px; color: rgba(200,16,46,0.85); letter-spacing: 0.12em; text-transform: uppercase; }
-
-        .dl-btn {
-          display: inline-flex; align-items: center; gap: 7px;
-          background: #c8102e; border: none; border-radius: 8px;
-          padding: 10px 18px; color: white;
-          font-size: 13px; font-weight: 600; cursor: pointer;
-          white-space: nowrap; flex-shrink: 0;
-          transition: background 0.18s, transform 0.15s;
-          box-shadow: 0 2px 8px rgba(200,16,46,0.35);
-        }
-        .dl-btn:hover { background: #a50d25; transform: translateY(-1px); }
-
-        .conf-meta { padding: 18px 22px 16px; }
-        .conf-title {
-          font-size: clamp(16px, 2.5vw, 21px);
-          font-weight: 700; color: #0d2055;
-          font-family: Georgia, 'Times New Roman', serif;
-          margin-bottom: 8px; letter-spacing: -0.01em;
-        }
-        .conf-title sup { font-size: 0.58em; vertical-align: super; }
-        .conf-details {
-          display: flex; flex-wrap: wrap; gap: 6px 14px;
-          font-size: 13px; color: #374151; margin-bottom: 6px;
-        }
-        .sep { color: #c8102e; }
-        .conf-theme { display: flex; align-items: baseline; gap: 7px; font-size: 13px; }
-        .theme-label { font-weight: 700; color: #0d2055; }
-        .theme-text  { color: #c8102e; font-style: italic; font-family: Georgia, serif; }
-
-        /* ── Day tabs ── */
-        .tabs {
-          display: flex; gap: 10px;
-        }
-        .tab {
-          flex: 1;
-          background: white;
-          border: 1px solid #dde2ec;
-          border-radius: 12px; padding: 13px 12px;
-          cursor: pointer; text-align: center;
-          transition: all 0.22s;
-          display: flex; flex-direction: column; gap: 4px;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-        }
-        .tab:hover { border-color: rgba(200,16,46,0.4); background: #fff5f6; }
-        .tab--on {
-          background: #fff0f2;
-          border-color: #c8102e;
-          box-shadow: 0 0 0 3px rgba(200,16,46,0.1), 0 2px 8px rgba(200,16,46,0.15);
-        }
-        .tab-day  { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #c8102e; }
-        .tab-date { font-size: 13px; font-weight: 600; color: #0d2055; }
-
-        /* ── Date rule ── */
-        .date-rule { display: flex; align-items: center; gap: 12px; }
-        .rule-line { flex: 1; height: 1px; background: #e2e6ed; }
-        .rule-text { font-size: 11px; color: #9ca3af; letter-spacing: 0.08em; white-space: nowrap; }
-
-        /* ── Footer ── */
-        .footer {
-          text-align: center; font-size: 12px; color: #9ca3af;
-          letter-spacing: 0.07em; padding-top: 4px;
-        }
-
-        @media (max-width: 600px) {
-          .root { padding: 0 0 40px; }
-          .header { border-radius: 0; border-left: none; border-right: none; }
-          .dl-btn span { display: none; }
-        }
-      `}</style>
     </>
   )
 }
@@ -332,58 +218,58 @@ export default function ProgramPage() {
 /* ── Session table component ─────────────────────────────────────────────── */
 function SessionBlock({ sessions }) {
   return (
-    <div className="session-wrap">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
       {/* Column headers */}
-      <div className="table-head">
-        <div className="th">Time</div>
-        <div className="th">Activity</div>
-        <div className="th hide-sm">Resource Person</div>
-        <div className="th hide-sm">Moderator</div>
+      <div className="table-head grid grid-cols-[155px_1fr_210px_185px] bg-gray-50 border-b-2 border-red-600">
+        <div className="px-3.5 py-2 text-[10px] font-bold tracking-wider uppercase text-gray-500">Time</div>
+        <div className="px-3.5 py-2 text-[10px] font-bold tracking-wider uppercase text-gray-500 border-l border-gray-200">Activity</div>
+        <div className="px-3.5 py-2 text-[10px] font-bold tracking-wider uppercase text-gray-500 border-l border-gray-200 hide-sm">Resource Person</div>
+        <div className="px-3.5 py-2 text-[10px] font-bold tracking-wider uppercase text-gray-500 border-l border-gray-200 hide-sm">Moderator</div>
       </div>
 
       {/* Rows */}
-      <div className="sessions">
+      <div className="sessions flex flex-col">
         {sessions.map((s, i) => {
           const cfg = TYPE_CONFIG[s.type]
           return (
             <div
               key={i}
-              className="row"
+              className="row grid grid-cols-[155px_1fr_210px_185px] border border-t-0 border-l-0 border-r-0 items-stretch animate-[fadeIn_0.38s_ease_both] hover:brightness-95 min-h-[50px]"
               style={{
-                background: cfg.bg,
+                backgroundColor: cfg.bg,
                 borderColor: cfg.border,
                 animationDelay: `${i * 0.04}s`,
               }}
             >
               {/* Time col */}
-              <div className="col-time" style={{ borderRightColor: cfg.border }}>
-                <span className="s-icon">{s.icon}</span>
-                <span className="s-time" style={{ color: cfg.timeColor }}>{s.time}</span>
-                <span className="s-tag" style={{ color: cfg.tag, background: cfg.tagBg }}>{cfg.label}</span>
+              <div className="col-time flex flex-col items-start gap-1.5 p-3 pl-4 border-r justify-center" style={{ borderRightColor: cfg.border }}>
+                <span className="s-icon text-lg leading-none">{s.icon}</span>
+                <span className="s-time text-[11px] font-semibold leading-tight" style={{ color: cfg.timeColor }}>{s.time}</span>
+                <span className="s-tag text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full" style={{ color: cfg.tag, backgroundColor: cfg.tagBg }}>{cfg.label}</span>
               </div>
 
               {/* Activity col */}
-              <div className="col-activity" style={{ borderRightColor: cfg.border }}>
-                <span className={`s-activity ${cfg.actBold ? 's-activity--bold' : ''}`}>
+              <div className="col-activity p-3 border-r flex items-center" style={{ borderRightColor: cfg.border }}>
+                <span className={`s-activity text-[13.5px] text-gray-900 leading-relaxed ${cfg.actBold ? 'font-bold' : ''}`}>
                   {s.activity}
                 </span>
               </div>
 
               {/* Resource col */}
-              <div className="col-person hide-sm" style={{ borderRightColor: cfg.border }}>
-                {s.resource && <span className="s-person">{s.resource}</span>}
+              <div className="col-person p-3 border-r flex items-center hide-sm" style={{ borderRightColor: cfg.border }}>
+                {s.resource && <span className="s-person text-xs text-gray-700 leading-relaxed">{s.resource}</span>}
               </div>
 
               {/* Moderator col */}
-              <div className="col-person col-mod hide-sm">
-                {s.moderator && <span className="s-person s-mod">{s.moderator}</span>}
+              <div className="col-person p-3 flex items-center hide-sm">
+                {s.moderator && <span className="s-person text-xs text-[#1a3a7a] italic leading-relaxed">{s.moderator}</span>}
               </div>
 
               {/* Mobile: stacked people */}
               {(s.resource || s.moderator) && (
-                <div className="mobile-meta show-sm">
-                  {s.resource  && <span className="mm"><b>Resource:</b> {s.resource}</span>}
-                  {s.moderator && <span className="mm"><b>Moderator:</b> {s.moderator}</span>}
+                <div className="mobile-meta col-span-full flex-col gap-0.5 px-3.5 pb-3 show-sm hidden">
+                  {s.resource  && <span className="mm text-[11.5px] text-gray-600"><b className="text-red-600 font-semibold">Resource:</b> {s.resource}</span>}
+                  {s.moderator && <span className="mm text-[11.5px] text-gray-600"><b className="text-red-600 font-semibold">Moderator:</b> {s.moderator}</span>}
                 </div>
               )}
             </div>
@@ -392,99 +278,17 @@ function SessionBlock({ sessions }) {
       </div>
 
       <style jsx>{`
-        .session-wrap {
-          background: white;
-          border-radius: 14px;
-          border: 1px solid #e2e6ed;
-          box-shadow: 0 2px 12px rgba(13,32,85,0.07);
-          overflow: hidden;
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Table header */
-        .table-head {
-          display: grid;
-          grid-template-columns: 155px 1fr 210px 185px;
-          background: #f8f9fc;
-          border-bottom: 2px solid #c8102e;
-        }
-        .th {
-          padding: 9px 14px;
-          font-size: 10px; font-weight: 700;
-          letter-spacing: 0.13em; text-transform: uppercase;
-          color: #6b7280;
-        }
-        .th + .th { border-left: 1px solid #e5e7eb; }
-
-        /* Sessions list */
-        .sessions { display: flex; flex-direction: column; gap: 0; }
-
-        /* Each row */
-        .row {
-          border: 1px solid;
-          border-left-width: 0; border-right-width: 0; border-top-width: 0;
-          display: grid;
-          grid-template-columns: 155px 1fr 210px 185px;
-          align-items: stretch;
-          animation: up 0.38s ease both;
-          transition: filter 0.15s;
-          min-height: 50px;
-        }
-        .row:hover { filter: brightness(0.972); }
-        @keyframes up { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-
-        /* Time col */
-        .col-time {
-          display: flex; flex-direction: column;
-          align-items: flex-start; gap: 5px;
-          padding: 12px 12px 12px 16px;
-          border-right: 1px solid;
-          justify-content: center;
-        }
-        .s-icon  { font-size: 17px; line-height: 1; }
-        .s-time  { font-size: 11px; font-weight: 600; line-height: 1.4; }
-        .s-tag   {
-          font-size: 9px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          padding: 2px 8px; border-radius: 100px;
-        }
-
-        /* Activity col */
-        .col-activity {
-          padding: 12px 14px;
-          border-right: 1px solid;
-          display: flex; align-items: center;
-        }
-        .s-activity      { font-size: 13.5px; color: #111827; line-height: 1.45; }
-        .s-activity--bold { font-weight: 700; }
-
-        /* Person cols */
-        .col-person {
-          padding: 12px 12px;
-          border-right: 1px solid #e5e7eb;
-          display: flex; align-items: center;
-        }
-        .col-mod { border-right: none; }
-        .s-person { font-size: 12px; color: #374151; line-height: 1.5; }
-        .s-mod    { color: #1a3a7a; font-style: italic; }
-
-        /* Mobile */
-        .mobile-meta {
-          grid-column: 1 / -1;
-          display: flex; flex-direction: column; gap: 3px;
-          padding: 4px 14px 12px;
-        }
-        .mm { font-size: 11.5px; color: #4b5563; }
-        .mm b { color: #c8102e; font-weight: 600; }
-
-        .hide-sm { display: flex; }
-        .show-sm  { display: none;  }
 
         @media (max-width: 640px) {
-          .table-head  { grid-template-columns: 115px 1fr; }
-          .row         { grid-template-columns: 115px 1fr; }
-          .hide-sm     { display: none; }
-          .show-sm     { display: flex; }
-          .col-activity { border-right: none; }
+          .table-head { grid-template-columns: 115px 1fr !important; }
+          .row { grid-template-columns: 115px 1fr !important; }
+          .hide-sm { display: none !important; }
+          .show-sm { display: flex !important; }
+          .col-activity { border-right: none !important; }
         }
       `}</style>
     </div>
