@@ -25,6 +25,7 @@ model Registration {
   telephone          String?
   profession         String?
   residentialAddress String?
+  attendedAt  DateTime?
 
   @@index([confirmationCode])
   @@index([email])
