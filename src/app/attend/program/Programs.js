@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 const THEME = "Growing the Movement Impacting Communities"
 
@@ -56,92 +56,32 @@ const TYPE_CONFIG = {
 
 export default function ProgramPage() {
   const [activeDay, setActiveDay] = useState(0)
+  const searchParams = useSearchParams()
+  const isPrint = searchParams.get('print') === '1'
+
   const prog = PROGRAMME[activeDay]
-  const printRef = useRef(null)
 
-  const handleDownload = async () => {
-  const element = printRef.current
-  if (!element) return
-
-  const { toPng } = await import('html-to-image')
-  const jsPDF = (await import('jspdf')).default
-
-  const imgData = await toPng(element, {
-    scale: 2,
-    cacheBust: true,
-  })
-
-  const img = new window.Image()
-  img.src = imgData
-  img.onload = () => {
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-    const pdfWidth = pdf.internal.pageSize.getWidth()
-    const pdfHeight = (img.height * pdfWidth) / img.width
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
-    pdf.save('KenyaDistrictConference2026-Programme.pdf')
+  const handleDownload = () => {
+    window.location.href = '/api/download-programme'
   }
-}
 
   return (
     <>
-      {/* Global print styles */}
       <style>{`
-        @media print {
-          .no-print { display: none !important; }
-          body { background: white !important; }
-          .print-all { display: flex !important; }
-          .screen-only { display: none !important; }
-          
-          /* Adjust grid for portrait */
-          .table-head {
-            grid-template-columns: 120px 1fr 180px 150px !important;
-          }
-          .row {
-            grid-template-columns: 120px 1fr 180px 150px !important;
-          }
-          
-          /* Reduce font sizes for portrait */
-          .s-activity { font-size: 12px !important; }
-          .s-person { font-size: 10.5px !important; }
-          .s-time { font-size: 10px !important; }
-
-          /* Header print tweaks */
-          .logo-banner {
-            box-shadow: none !important;
-            border: 1px solid #dde2ec !important;
-          }
-
-          /* Day section headers for print */
-          .print-day-heading {
-            display: flex !important;
-            background: #0d2055 !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-          }
-
-          /* Rows */
-          .row {
-            break-inside: avoid;
-            box-shadow: none !important;
-            animation: none !important;
-            transform: none !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-          }
-          .row:hover { transform: none !important; }
-          .table-head { break-inside: avoid; }
-
-          .day-block + .day-block { page-break-before: always; }
-
-          /* Portrait orientation */
-          @page { 
-            size: A4 portrait; 
-            margin: 12mm 15mm; 
-          }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 640px) {
+          .table-head { grid-template-columns: 115px 1fr !important; }
+          .row        { grid-template-columns: 115px 1fr !important; }
+          .hide-sm    { display: none !important; }
+          .show-sm    { display: flex !important; }
+          .col-activity { border-right: none !important; }
         }
       `}</style>
 
-      <div ref={printRef} className="min-h-screen bg-gray-100 font-sans py-7 px-4 md:py-8 md:px-4">
+      <div className="min-h-screen bg-gray-100 font-sans py-7 px-4 md:py-8 md:px-4">
         <div className="max-w-4xl mx-auto flex flex-col gap-5">
 
           {/* ── HEADER ─────────────────────────────────────────── */}
@@ -163,15 +103,20 @@ export default function ProgramPage() {
                 <span className="text-[11px] text-red-500/90 uppercase tracking-wider">22nd Annual · 2026</span>
               </div>
 
-              {/* Download button — screen only */}
-              <button className="no-print inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 border-none rounded-lg px-4 py-2.5 text-white text-xs md:text-sm font-semibold cursor-pointer whitespace-nowrap flex-shrink-0 transition-all hover:-translate-y-px shadow-md"  onClick={handleDownload} >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="7 10 12 15 17 10"/>
-                  <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                Download PDF
-              </button>
+              {/* Download button — hidden on print view */}
+              {!isPrint && (
+                <button
+                  className="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 border-none rounded-lg px-4 py-2.5 text-white text-xs md:text-sm font-semibold cursor-pointer whitespace-nowrap flex-shrink-0 transition-all hover:-translate-y-px shadow-md"
+                  onClick={handleDownload}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  Download PDF
+                </button>
+              )}
             </div>
 
             <div className="p-4 md:p-5">
@@ -190,46 +135,51 @@ export default function ProgramPage() {
             </div>
           </div>
 
-          {/* ── DAY TABS (screen only) ──────────────────────────── */}
-          <div className="no-print flex gap-2.5">
-            {PROGRAMME.map((d, i) => (
-              <button
-                key={i}
-                className={`flex-1 bg-white border border-gray-200 rounded-xl p-3 md:p-4 cursor-pointer text-center transition-all flex flex-col gap-1 shadow-sm ${
-                  activeDay === i 
-                    ? 'bg-red-50 border-red-600 shadow-[0_0_0_3px_rgba(200,16,46,0.1)]' 
-                    : 'hover:border-red-300 hover:bg-red-50/50'
-                }`}
-                onClick={() => setActiveDay(i)}
-              >
-                <span className="text-[10px] md:text-xs font-bold tracking-wider uppercase text-red-600">{d.day}</span>
-                <span className="text-xs md:text-sm font-semibold text-[#0d2055]">{d.date.split(',')[0]}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* ── SCREEN: active day only ─────────────────────────── */}
-          <div className="screen-only">
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-[11px] text-gray-400 tracking-wide whitespace-nowrap">{prog.date}</span>
-              <div className="flex-1 h-px bg-gray-200" />
+          {/* ── DAY TABS — only on interactive screen view ──────── */}
+          {!isPrint && (
+            <div className="flex gap-2.5">
+              {PROGRAMME.map((d, i) => (
+                <button
+                  key={i}
+                  className={`flex-1 bg-white border border-gray-200 rounded-xl p-3 md:p-4 cursor-pointer text-center transition-all flex flex-col gap-1 shadow-sm ${
+                    activeDay === i
+                      ? 'bg-red-50 border-red-600 shadow-[0_0_0_3px_rgba(200,16,46,0.1)]'
+                      : 'hover:border-red-300 hover:bg-red-50/50'
+                  }`}
+                  onClick={() => setActiveDay(i)}
+                >
+                  <span className="text-[10px] md:text-xs font-bold tracking-wider uppercase text-red-600">{d.day}</span>
+                  <span className="text-xs md:text-sm font-semibold text-[#0d2055]">{d.date.split(',')[0]}</span>
+                </button>
+              ))}
             </div>
-            <SessionBlock sessions={prog.sessions} />
-          </div>
+          )}
 
-          {/* ── PRINT: all days ─────────────────────────────────── */}
-          <div className="print-all hidden flex-col gap-5">
-            {PROGRAMME.map((d, i) => (
-              <div key={i} className="day-block">
-                <div className="hidden print-day-heading items-center gap-3.5 bg-[#0d2055] px-4 py-2 rounded-t-lg mb-0">
-                  <span className="text-[11px] font-bold text-white uppercase tracking-wider">{d.day}</span>
-                  <span className="text-[11px] text-white/60">{d.date}</span>
+          {/* ── CONTENT ─────────────────────────────────────────── */}
+          {isPrint ? (
+            // Print view: all days
+            <div className="flex flex-col gap-5">
+              {PROGRAMME.map((d, i) => (
+                <div key={i} className="flex flex-col gap-2">
+                  <div className="flex items-center gap-3 bg-[#0d2055] px-4 py-2 rounded-t-lg">
+                    <span className="text-[11px] font-bold text-white uppercase tracking-wider">{d.day}</span>
+                    <span className="text-[11px] text-white/60">{d.date}</span>
+                  </div>
+                  <SessionBlock sessions={d.sessions} />
                 </div>
-                <SessionBlock sessions={d.sessions} />
+              ))}
+            </div>
+          ) : (
+            // Interactive view: active day only
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex-1 h-px bg-gray-200" />
+                <span className="text-[11px] text-gray-400 tracking-wide whitespace-nowrap">{prog.date}</span>
+                <div className="flex-1 h-px bg-gray-200" />
               </div>
-            ))}
-          </div>
+              <SessionBlock sessions={prog.sessions} />
+            </div>
+          )}
 
           <p className="text-center text-xs text-gray-400 tracking-wide pt-1">
             Kenya District · Y's Men International · 2026
@@ -253,69 +203,62 @@ function SessionBlock({ sessions }) {
       </div>
 
       {/* Rows */}
-      <div className="sessions flex flex-col">
+      <div className="flex flex-col">
         {sessions.map((s, i) => {
           const cfg = TYPE_CONFIG[s.type]
           return (
             <div
               key={i}
-              className="row grid grid-cols-[155px_1fr_210px_185px] border border-t-0 border-l-0 border-r-0 items-stretch animate-[fadeIn_0.38s_ease_both] hover:brightness-95 min-h-[50px]"
+              className="row grid grid-cols-[155px_1fr_210px_185px] border border-t-0 border-l-0 border-r-0 items-stretch hover:brightness-95 min-h-[50px]"
               style={{
                 backgroundColor: cfg.bg,
                 borderColor: cfg.border,
-                animationDelay: `${i * 0.04}s`,
+                animation: `fadeIn 0.38s ease ${i * 0.04}s both`,
               }}
             >
               {/* Time col */}
-              <div className="col-time flex flex-col items-start gap-1.5 p-3 pl-4 border-r justify-center" style={{ borderRightColor: cfg.border }}>
-                <span className="s-icon text-lg leading-none">{s.icon}</span>
-                <span className="s-time text-[11px] font-semibold leading-tight" style={{ color: cfg.timeColor }}>{s.time}</span>
-                <span className="s-tag text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full" style={{ color: cfg.tag, backgroundColor: cfg.tagBg }}>{cfg.label}</span>
+              <div
+                className="flex flex-col items-start gap-1.5 p-3 pl-4 border-r justify-center"
+                style={{ borderRightColor: cfg.border }}
+              >
+                <span className="text-lg leading-none">{s.icon}</span>
+                <span className="text-[11px] font-semibold leading-tight" style={{ color: cfg.timeColor }}>{s.time}</span>
+                <span
+                  className="text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full"
+                  style={{ color: cfg.tag, backgroundColor: cfg.tagBg }}
+                >
+                  {cfg.label}
+                </span>
               </div>
 
               {/* Activity col */}
               <div className="col-activity p-3 border-r flex items-center" style={{ borderRightColor: cfg.border }}>
-                <span className={`s-activity text-[13.5px] text-gray-900 leading-relaxed ${cfg.actBold ? 'font-bold' : ''}`}>
+                <span className={`text-[13.5px] text-gray-900 leading-relaxed ${cfg.actBold ? 'font-bold' : ''}`}>
                   {s.activity}
                 </span>
               </div>
 
               {/* Resource col */}
-              <div className="col-person p-3 border-r flex items-center hide-sm" style={{ borderRightColor: cfg.border }}>
-                {s.resource && <span className="s-person text-xs text-gray-700 leading-relaxed">{s.resource}</span>}
+              <div className="p-3 border-r flex items-center hide-sm" style={{ borderRightColor: cfg.border }}>
+                {s.resource && <span className="text-xs text-gray-700 leading-relaxed">{s.resource}</span>}
               </div>
 
               {/* Moderator col */}
-              <div className="col-person p-3 flex items-center hide-sm">
-                {s.moderator && <span className="s-person text-xs text-[#1a3a7a] italic leading-relaxed">{s.moderator}</span>}
+              <div className="p-3 flex items-center hide-sm">
+                {s.moderator && <span className="text-xs text-[#1a3a7a] italic leading-relaxed">{s.moderator}</span>}
               </div>
 
-              {/* Mobile: stacked people */}
+              {/* Mobile stacked people */}
               {(s.resource || s.moderator) && (
-                <div className="mobile-meta col-span-full flex-col gap-0.5 px-3.5 pb-3 show-sm hidden">
-                  {s.resource  && <span className="mm text-[11.5px] text-gray-600"><b className="text-red-600 font-semibold">Resource:</b> {s.resource}</span>}
-                  {s.moderator && <span className="mm text-[11.5px] text-gray-600"><b className="text-red-600 font-semibold">Moderator:</b> {s.moderator}</span>}
+                <div className="col-span-full flex-col gap-0.5 px-3.5 pb-3 show-sm hidden">
+                  {s.resource  && <span className="text-[11.5px] text-gray-600"><b className="text-red-600 font-semibold">Resource:</b> {s.resource}</span>}
+                  {s.moderator && <span className="text-[11.5px] text-gray-600"><b className="text-red-600 font-semibold">Moderator:</b> {s.moderator}</span>}
                 </div>
               )}
             </div>
           )
         })}
       </div>
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 640px) {
-          .table-head { grid-template-columns: 115px 1fr !important; }
-          .row { grid-template-columns: 115px 1fr !important; }
-          .hide-sm { display: none !important; }
-          .show-sm { display: flex !important; }
-          .col-activity { border-right: none !important; }
-        }
-      `}</style>
     </div>
   )
 }
